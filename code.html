@@ -1,6 +1,7 @@
 <!doctype html>
 <!-- See http://www.firepad.io/docs/ for detailed embedding docs. -->
 <html>
+
 <head>
   <meta charset="utf-8" />
   <!-- Firebase -->
@@ -11,24 +12,55 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.css" />
 
   <!-- Firepad -->
-  <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" />
+  <!-- <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" /> -->
   <script src="https://firepad.io/releases/v1.5.9/firepad.min.js"></script>
 
+  <link rel="stylesheet" href="lib/firepad.css" />
+  <!-- <link href="lib/firepad.js" /> -->
+
   <style>
-    html { height: 100%; }
-    body { margin: 0; height: 100%; position: relative; }
+    html {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      height: 100%;
+      position: relative;
+    }
+
     /* Height / width / positioning can be customized for your use case.
        For demo purposes, we make firepad fill the entire browser. */
     #firepad-container {
-      width: 100%;
+      width: 85%;
       height: 100%;
     }
   </style>
+
 </head>
 
 <body onload="init()">
-  <div id="firepad-container"></div>
 
+  <div id="firepad-container"></div>
+  <div class="sidenav">
+    <a href="#">Edit Sharing Options</a>
+    <a href="#">View Collaboration Metrics</a>
+    <a href="#">Request Code Review</a>
+  </div>
+
+ <!--  <div id = "sidebar">
+    <div class = "toggle-button" onclick = "toggleSidebar()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <ul>
+      <li>Edit Sharing Options</li>
+      <li>View Metrics</li>
+      <li>Request Review</li>
+    </ul>
+  </div>
+ -->
   <script>
     function init() {
       //// Initialize Firebase.
@@ -72,4 +104,5 @@
     }
   </script>
 </body>
+
 </html>
