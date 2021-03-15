@@ -14,7 +14,7 @@
   <!-- Firepad -->
   <!-- <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" /> -->
   <script src="https://firepad.io/releases/v1.5.9/firepad.min.js"></script>
-  <!-- <script src="lib/responsive-sidebar.js"></script> -->
+  <script src="lib/responsive-sidebar.js"></script>
 
   <link rel="stylesheet" href="lib/firepad.css" />
   <!-- <link href="lib/firepad.js" /> -->
@@ -42,15 +42,37 @@
 
 <body onload="init()">
 
-  <div id="firepad-container"></div>
-  <div class="sidenav">
-    <a href='trans.php'><img src='export icon.png'/></a>
-    <a href="#">Sharing Options</a>
-    <a href="#">View Collaboration Metrics</a>
-    <a href="#">Request Code Review</a>
-  </div>
+    <div class="main-content">
+        <div class="sidebar">
+            <div class="sidebar__inner">
+                <!-- Content goes here -->
+                <div class="sidenav">
+                    <a href="#">Edit Sharing Options</a>
+                    <a href="#">View Collaboration Metrics</a>
+                    <a href="#">Request Code Review</a>
+                  </div>
+            </div>
+        </div>
+        <div class="content">
+            <!-- Content goes here -->
+            <div id="firepad-container"></div>
 
- 
+        </div>
+    </div>
+
+ <!--  <div id = "sidebar">
+    <div class = "toggle-button" onclick = "toggleSidebar()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <ul>
+      <li>Edit Sharing Options</li>
+      <li>View Metrics</li>
+      <li>Request Review</li>
+    </ul>
+  </div>
+ -->
   <script>
     function init() {
       //// Initialize Firebase.
