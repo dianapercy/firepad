@@ -25,6 +25,9 @@
   <script src="firepad-userlist.js"></script>
   <link rel="stylesheet" href="firepad-userlist.css" />
 
+  <!-- for the sidebar-->
+  <script src="firepad-history.js"></script>
+
   <style>
     html {
       height: 100%;
@@ -59,7 +62,7 @@
 <body onload="init()">
   <div id="userlist"></div>
   <div id="firepad-container"></div>
-  <div class="sidenav">
+  <div class="sidenav" id="side-info">
     <a href="#">Sharing Options</a>
     <a href="#">View Collaboration Metrics</a>
     <a href="#">Request Code Review</a>
@@ -105,20 +108,25 @@
 
       //// Create Firepad.
       var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror, {
-        defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  var message = "Hello, world.";\n  console.log(message);\n}',
+        //defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  var message = "Hello, world.";\n  console.log(message);\n}',
         userId: userId
       });
 
       //// Create FirepadUserList (with our desired userId).
       var firepadUserList = FirepadUserList.fromDiv(firepadRef.child('users'),
           document.getElementById('userlist'), userId);
+
+      //// Create Firepadhistory.
+      var firepadHistory = FirepadHistoryList.fromDiv(firepadRef,
+          document.getElementById('side-info'), userId);
+      
       
       //// Initialize contents.
-      //firepad.on('ready', function() {
-        //if (firepad.isHistoryEmpty()) {
-          //firepad.setText('Check out the user list to the left!');
-        //}
-      //});
+      firepad.on('ready', function() {
+        if (firepad.isHistoryEmpty()) {
+          firepad.setText('Begin writing your python code here!');
+        }
+      });
 
     }
 

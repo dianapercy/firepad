@@ -15,6 +15,7 @@ var FirepadUserList = (function() {
     this.firebaseOn_(ref.root.child('.info/connected'), 'value', function(s) {
       if (s.val() === true && self.displayName_) {
         var nameRef = ref.child(self.userId_).child('name');
+        //may want to change this later to maintain a history
         nameRef.onDisconnect().remove();
         nameRef.set(self.displayName_);
       }
