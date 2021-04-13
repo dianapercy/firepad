@@ -1,151 +1,187 @@
-<!doctype html>
+<!DOCTYPE html>
 <!-- See http://www.firepad.io/docs/ for detailed embedding docs. -->
 <html>
+  <head>
+    <title>Pair programming</title>
+    <meta charset="utf-8" />
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
+    <!-- CodeMirror and its python mode file -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.js"></script>
+    <!---<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/mode/javascript/javascript.js"></script> --->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/mode//python/python.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.css"
+    />
 
-<head>
-  <title>Pair programming</title>
-  <meta charset="utf-8" />
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
-  <!-- CodeMirror and its python mode file -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.js"></script>
-  <!---<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/mode/javascript/javascript.js"></script> --->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/mode//python/python.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.17.0/codemirror.css" />
+    <!-- Firepad -->
+    <!-- <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" /> -->
+    <script src="https://firepad.io/releases/v1.5.9/firepad.min.js"></script>
+    <!-- <script src="lib/responsive-sidebar.js"></script> -->
 
-  <!-- Firepad -->
-  <!-- <link rel="stylesheet" href="https://firepad.io/releases/v1.5.9/firepad.css" /> -->
-  <script src="https://firepad.io/releases/v1.5.9/firepad.min.js"></script>
-  <!-- <script src="lib/responsive-sidebar.js"></script> -->
+    <link rel="stylesheet" href="lib/firepad.css" />
+    <!-- <link href="lib/firepad.js" /> -->
 
-  <link rel="stylesheet" href="lib/firepad.css" />
-  <!-- <link href="lib/firepad.js" /> -->
+    <!-- to list the usernames-->
+    <script src="firepad-userlist.js"></script>
+    <link rel="stylesheet" href="firepad-userlist.css" />
 
-  <!-- to list the usernames-->
-  <script src="firepad-userlist.js"></script>
-  <link rel="stylesheet" href="firepad-userlist.css" />
+    <!-- for the sidebar-->
+    <script src="firepad-history.js"></script>
 
-  <!-- for the sidebar-->
-  <script src="firepad-history.js"></script>
+    <!-- style sheet for sidebar with collaboration -->
+    <link rel="stylesheet" href="firepad-collaboration.css" />
 
-  <style>
-    html {
-      height: 100%;
-    }
 
-    body {
-      margin: 0;
-      height: 100%;
-      position: relative;
-    }
+    <style>
+      html {
+        height: 100%;
+      }
 
-    #userlist {
-      position: absolute; left: 0; top: 0; bottom: 0; height: auto;
-      width: 175px;
-    }
+      body {
+        margin: 0;
+        height: 100%;
+        position: relative;
+      }
 
-    /* Height / width / positioning can be customized for your use case.
+      #userlist {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        height: auto;
+        width: 175px;
+      }
+
+      /* Height / width / positioning can be customized for your use case.
        For demo purposes, we make firepad fill the entire browser. */
-    #firepad-container {
-      position: absolute; 
-      left: 175px; 
-      top: 0; 
-      bottom: 0; 
-      right: 175px; 
-      height: auto;
-      border-style: solid
-    }
-  </style>
+      #firepad-container {
+        position: absolute;
+        left: 175px;
+        top: 0;
+        bottom: 0;
+        right: 175px;
+        height: auto;
+        border-style: solid;
+      }
 
-</head>
+      .piechart {
+        margin-top: 300px;
+        display: block;
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background-image: conic-gradient(
+          pink 70deg,
+          lightblue 0 235deg,
+          orange 0
+        );
+      }
 
-<body onload="init()">
-  <div id="userlist"></div>
-  <div id="firepad-container"></div>
-  <div class="sidenav" id="side-info">
-    <a href="#">Sharing Options</a>
-    <a href="#">View Collaboration Metrics</a>
-    <a href="#">Request Code Review</a>
-  </div>
+      body,
+      .piechart {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
 
- 
-  <script>
-    function init() {
-      //// Initialize Firebase.
-      //// TODO: replace with your Firebase project configuration.
-      var config = {
-        apiKey: '<API_KEY>',
+  <body onload="init()">
+    <div id="userlist"></div>
+    <div id="firepad-container"></div>
+    <div class="sidenav" id="side-info">
+      <a>Collaboration Percents</a>
+      <div class="piechart"></div>
+    </div>
+
+    <script>
+      function init() {
+        //// Initialize Firebase.
+        //// TODO: replace with your Firebase project configuration.
+        var config = {
+          apiKey: "<API_KEY>",
           authDomain: "multimodal-coding-default-rtdb.firebaseapp.com",
-        databaseURL: "https://multimodal-coding-default-rtdb.firebaseio.com"
-      };
-      firebase.initializeApp(config);
+          databaseURL: "https://multimodal-coding-default-rtdb.firebaseio.com"
+        };
+        firebase.initializeApp(config);
 
-      //// Get Firebase Database reference.
-      var firepadRef = getExampleRef();
+        //// Get Firebase Database reference.
+        var firepadRef = getExampleRef();
 
-      //// Create CodeMirror (with line numbers and the JavaScript mode).
-      var codeMirror = CodeMirror(document.getElementById('firepad-container'), {
-        mode: "python", // Language mode
-        //theme: "leetcode", // theme
-        //keyMap: "sublime", // Fast key style
-        lineNumbers: true, // set number
-        smartIndent: true, // smart indent
-        indentUnit: 4, // Smart indent in 4 spaces
-        indentWithTabs: true, // Smart indent with tabs
-        //lineWrapping: true, // 
-        // Add line number display, folder and syntax detector to the slot
-        //gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"], 
-        //foldGutter: true, // Enable code folding in slots
-        //autofocus: true, // Autofocus
-        //matchBrackets: true, // Match end symbols, such as "],}"
-        //autoCloseBrackets: true, // Auto close symbol
-        //styleActiveLine: true, // Display the style of the selected row
-      });
+        //// Create CodeMirror (with line numbers and the JavaScript mode).
+        var codeMirror = CodeMirror(
+          document.getElementById("firepad-container"),
+          {
+            mode: "python", // Language mode
+            //theme: "leetcode", // theme
+            //keyMap: "sublime", // Fast key style
+            lineNumbers: true, // set number
+            smartIndent: true, // smart indent
+            indentUnit: 4, // Smart indent in 4 spaces
+            indentWithTabs: true // Smart indent with tabs
+            //lineWrapping: true, //
+            // Add line number display, folder and syntax detector to the slot
+            //gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+            //foldGutter: true, // Enable code folding in slots
+            //autofocus: true, // Autofocus
+            //matchBrackets: true, // Match end symbols, such as "],}"
+            //autoCloseBrackets: true, // Auto close symbol
+            //styleActiveLine: true, // Display the style of the selected row
+          }
+        );
 
-      // Create a random ID to use as our user ID (we must give this to firepad and FirepadUserList).
-      var userId = Math.floor(Math.random() * 9999999999).toString();
+        // Create a random ID to use as our user ID (we must give this to firepad and FirepadUserList).
+        var userId = Math.floor(Math.random() * 9999999999).toString();
 
+        //// Create Firepad.
+        var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror, {
+          //defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  var message = "Hello, world.";\n  console.log(message);\n}',
+          userId: userId
+        });
 
-      //// Create Firepad.
-      var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror, {
-        //defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  var message = "Hello, world.";\n  console.log(message);\n}',
-        userId: userId
-      });
+        //// Create FirepadUserList (with our desired userId).
+        var firepadUserList = FirepadUserList.fromDiv(
+          firepadRef.child("users"),
+          document.getElementById("userlist"),
+          userId
+        );
 
-      //// Create FirepadUserList (with our desired userId).
-      var firepadUserList = FirepadUserList.fromDiv(firepadRef.child('users'),
-          document.getElementById('userlist'), userId);
+        //// Create Firepadhistory.
+        var firepadHistory = FirepadHistoryList.fromDiv(
+          firepadRef,
+          document.getElementById("side-info"),
+          userId
+        );
 
-      //// Create Firepadhistory.
-      var firepadHistory = FirepadHistoryList.fromDiv(firepadRef,
-          document.getElementById('side-info'), userId);
-      
-      
-      //// Initialize contents.
-      firepad.on('ready', function() {
-        if (firepad.isHistoryEmpty()) {
-          firepad.setText('Begin writing your python code here!');
+        //// Initialize contents.
+        firepad.on("ready", function() {
+          if (firepad.isHistoryEmpty()) {
+            firepad.setText("Begin writing your python code here!");
+          }
+        });
+      }
+
+      // NEED to call getHistory from js getHistory to get numbers for piechart
+
+      // Helper to get hash from end of URL or generate a random one.
+      function getExampleRef() {
+        
+        var ref = firebase.database().ref();
+        var hash = window.location.hash.replace(/#/g, "");
+        if (hash) {
+          ref = ref.child(hash);
+        } else {
+          ref = ref.push(); // generate unique location.
+          window.location = window.location + "#" + ref.key; // add it as a hash to the URL.
         }
-      });
-
-    }
-
-    // Helper to get hash from end of URL or generate a random one.
-    function getExampleRef() {
-      var ref = firebase.database().ref();
-      var hash = window.location.hash.replace(/#/g, '');
-      if (hash) {
-        ref = ref.child(hash);
-      } else {
-        ref = ref.push(); // generate unique location.
-        window.location = window.location + '#' + ref.key; // add it as a hash to the URL.
+        if (typeof console !== "undefined") {
+          console.log("Firebase data: ", ref.toString());
+        }
+        return ref;
       }
-      if (typeof console !== 'undefined') {
-        console.log('Firebase data: ', ref.toString());
-      }
-      return ref;
-    }
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>

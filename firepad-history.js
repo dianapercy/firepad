@@ -23,16 +23,21 @@ var FirepadHistoryList = (function() {
     /** the primary function for creating the layout, 
     * other functions called from here
     */
-    return elt('div', [
-      this.makeHeading_(),
-      elt('div', [this.makeUserEntries_()], {'class': 'side-nav' })
-    ], {'class': 'side-nav' });
+    
+    //return elt('div', [
+    //  this.makeHeading_(),
+    //  elt('div', [this.makeUserEntries_()], {'class': 'userlist' })], {'class': 'userlist' });
+      return elt('div', [
+        this.makeHeading_(),
+        elt('div', [this.makeUserEntries_()], {'class': 'userlist' })]);
   };
 
   FirepadHistoryList.prototype.makeHeading_ = function() {
     /** header */
+    //return elt('div', [
+    //  elt('span', 'View Collaboration Metrics')], { 'class': 'userlist' });
     return elt('div', [
-      elt('span', 'View Collaboration Metrics')], { 'class': 'side-nav' });
+        elt('span', 'View Collaboration Metrics')]);
   };
 
   FirepadHistoryList.prototype.makeUserEntries_ = function() {
@@ -72,7 +77,10 @@ var FirepadHistoryList = (function() {
       var colorDiv = elt('div', null, { 'class': 'firepad-userlist-color-indicator' });
       colorDiv.style.backgroundColor = color;
 
-      var nameDiv = elt('div', name || 'Guest', { 'class': 'side-nav' });
+      //var nameDiv = elt('div', name || 'Guest', { 'class': 'userlist' });
+      var nameDiv = elt('div', name || 'Guest');
+
+
 
       var userDiv = elt('div', [ colorDiv, nameDiv ], {
         'class': 'firepad-userlist-user ' + 'firepad-user-' + userId
@@ -118,7 +126,39 @@ var FirepadHistoryList = (function() {
       }
 
       // TO DO: do any calculations you need to with the data
+      
+      // Accumulate the number of entries made by a certain user
+      var userEntries = {}; // how do I make this global in js?
+      if (username in userEntries) {
+          userEntries[username] += 1;
+      }
+      else {
+        userEntries[username] = 1;
+      }
+
       // TO DO: create html to display the information
+      var pieDiv = elt('div', userEntries[username], { 'class': 'piechart', 'style' : '' }); // change HTML style of piechart in code.html to be able to change the size variables rather than having it in the CSS file
+      colorDiv.style.backgroundColor = color;
+
+      //var nameDiv = elt('div', name || 'Guest', { 'class': 'userlist' });
+      var nameDiv = elt('div', name || 'Guest');
+
+
+
+      var userDiv = elt('div', [ colorDiv, nameDiv ], {
+        'class': 'firepad-userlist-user ' + 'firepad-user-' + userId
+      });
+      userId2Element[userId] = userDiv;
+
+      //adds the new element to the list to be displayed
+      var nextElement =  prevChildName ? userId2Element[prevChildName].nextSibling : userList.firstChild;
+      userList.insertBefore(userDiv, nextElement);
+
+
+
+
+
+
     }
 
     //listeners for when things are changed in the database for the history
