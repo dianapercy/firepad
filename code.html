@@ -94,7 +94,14 @@
     <div id="firepad-container"></div>
     <div class="sidenav" id="side-info">
       <a>Collaboration Percents</a>
-      <div class="piechart"></div>
+      <div class = "test-user-edits" id = "test">
+        <p>test user edits</p>
+      </div>
+      <div class="piechart" style="background-image: conic-gradient(
+        pink 70deg,
+        lightblue 0 235deg,
+        orange 0 
+        );"></div>
     </div>
 
     <script>
@@ -165,6 +172,9 @@
       }
 
       // NEED to call getHistory from js getHistory to get numbers for piechart
+      // how do I call this so it sends in the test div ??
+      var getHistory = getHistory.fromDiv(firepadRef, document.getElementById("test"), userId);
+
 
       // Helper to get hash from end of URL or generate a random one.
       function getExampleRef() {

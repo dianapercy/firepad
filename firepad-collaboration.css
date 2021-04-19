@@ -33,11 +33,7 @@
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background-image: conic-gradient(
-        pink 70deg,
-        lightblue 0 235deg,
-        orange 0
-    ); /* how do I get these values to be variable? 
+     /* how do I get these values to be variable? 
     */
 }
 
@@ -45,4 +41,13 @@ body, .pie-chart {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.test-user-edits {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 10px;
+  font-family: Verdana, sans-serif;
+  color: white;
+  display: block;
 }

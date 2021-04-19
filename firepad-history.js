@@ -48,6 +48,8 @@ var FirepadHistoryList = (function() {
     var self = this;
     var userList = elt('div');
     var userId2Element = { };
+    var userEntries = { };
+    var userEntryList = elt('div');
 
     // TO DO: change all of the classes to match the css you want to use
     function getUsers(userSnapshot, prevChildName) {
@@ -79,8 +81,6 @@ var FirepadHistoryList = (function() {
 
       //var nameDiv = elt('div', name || 'Guest', { 'class': 'userlist' });
       var nameDiv = elt('div', name || 'Guest');
-
-
 
       var userDiv = elt('div', [ colorDiv, nameDiv ], {
         'class': 'firepad-userlist-user ' + 'firepad-user-' + userId
@@ -118,17 +118,18 @@ var FirepadHistoryList = (function() {
       var editLocation = '';
       var time = '';
       var edit = '';
+      var color = '';
       if (editId !== 'A0') {
         username = userSnapshot.child('a').val();
         editLocation = userSnapshot.child('o/0').val();
         time = userSnapshot.child('t').val();
         edit = userSnapshot.child('o/1').val();
+        color = userSnapshot.child('color').val();
       }
 
       // TO DO: do any calculations you need to with the data
-      
-      // Accumulate the number of entries made by a certain user
-      var userEntries = {}; // how do I make this global in js?
+      // Accumulate the number of entries made by a certain user into a dictionary userEntries
+      // key: username, value: number of edits made by them
       if (username in userEntries) {
           userEntries[username] += 1;
       }
@@ -140,10 +141,13 @@ var FirepadHistoryList = (function() {
       var pieDiv = elt('div', userEntries[username], { 'class': 'piechart', 'style' : '' }); // change HTML style of piechart in code.html to be able to change the size variables rather than having it in the CSS file
       colorDiv.style.backgroundColor = color;
 
+      //test adding user edits 
+      // want to append a child <p>
+      var testDiv = elt('p', username, {'class': 'test-user-edits'}); // How would I add the user color in here as a style?
+      userEntryList.appendChild(testDiv);
+
       //var nameDiv = elt('div', name || 'Guest', { 'class': 'userlist' });
       var nameDiv = elt('div', name || 'Guest');
-
-
 
       var userDiv = elt('div', [ colorDiv, nameDiv ], {
         'class': 'firepad-userlist-user ' + 'firepad-user-' + userId
