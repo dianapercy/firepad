@@ -12,7 +12,7 @@ var FirepadHistoryList = (function() {
     var self = this;
 
     // what you have built in this file is added to the element passed in
-    this.userList_ = this.makeUserList_()
+    this.userList_ = this.makeUserList_();
     place.appendChild(this.userList_);
   }
 
@@ -20,24 +20,24 @@ var FirepadHistoryList = (function() {
   FirepadHistoryList.fromDiv = FirepadHistoryList;
 
   FirepadHistoryList.prototype.makeUserList_ = function() {
-    /** the primary function for creating the layout, 
-    * other functions called from here
-    */
-    
+    /** the primary function for creating the layout,
+     * other functions called from here
+     */
+
     //return elt('div', [
     //  this.makeHeading_(),
     //  elt('div', [this.makeUserEntries_()], {'class': 'userlist' })], {'class': 'userlist' });
-      return elt('div', [
-        this.makeHeading_(),
-        elt('div', [this.makeUserEntries_()], {'class': 'userlist' })]);
+    return elt("div", [
+      this.makeHeading_(),
+      elt("div", [this.makeUserEntries_()], { class: "userlist" })
+    ]);
   };
 
   FirepadHistoryList.prototype.makeHeading_ = function() {
     /** header */
     //return elt('div', [
     //  elt('span', 'View Collaboration Metrics')], { 'class': 'userlist' });
-    return elt('div', [
-        elt('span', 'View Collaboration Metrics')]);
+    return elt("div", [elt("span", "View Collaboration Metrics")]);
   };
 
   FirepadHistoryList.prototype.makeUserEntries_ = function() {
@@ -46,17 +46,19 @@ var FirepadHistoryList = (function() {
      * for different types of data
      */
     var self = this;
-    var userList = elt('div');
-    var userId2Element = { };
-    var userEntries = { };
-    var userEntryList = elt('div');
+    var userList = elt("div");
+    var userId2Element = {};
+    var userEntries = {};
+    var userEntryList = elt("div");
+    var displayEntries = {};
 
     // TO DO: change all of the classes to match the css you want to use
+    /*
     function getUsers(userSnapshot, prevChildName) {
-      /**
-      * This function gets a list of the users currently signed in
-      * and creates the html to display them
-      */
+    
+    // This function gets a list of the users currently signed in
+    // and creates the html to display them
+    
       var userId = userSnapshot.key;
       var div = userId2Element[userId];
       if (div) {
@@ -104,87 +106,124 @@ var FirepadHistoryList = (function() {
         delete userId2Element[userId];
       }
     });
+    */
 
     function getHistory(userSnapshot, prevChildName) {
       /**
-      * This function gets data about the changes made to the firepad
-      */
+       * This function gets data about the changes made to the firepad
+       */
       //edit id
       var editId = userSnapshot.key;
 
-      //get the username for who made the edit and edit info only if 
+      //get the username for who made the edit and edit info only if
       //it is not the first default edit
-      var username = ''
-      var editLocation = '';
-      var time = '';
-      var edit = '';
-      var color = '';
-      if (editId !== 'A0') {
-        username = userSnapshot.child('a').val();
-        editLocation = userSnapshot.child('o/0').val();
-        time = userSnapshot.child('t').val();
-        edit = userSnapshot.child('o/1').val();
-        color = userSnapshot.child('color').val();
+      var username = "";
+      var editLocation = "";
+      var time = "";
+      var edit = "";
+      var color = "";
+      if (editId !== "A0") {
+        username = userSnapshot.child("a").val();
+        editLocation = userSnapshot.child("o/0").val();
+        time = userSnapshot.child("t").val();
+        edit = userSnapshot.child("o/1").val();
+        color = userSnapshot.child("color").val();
       }
 
       // TO DO: do any calculations you need to with the data
       // Accumulate the number of entries made by a certain user into a dictionary userEntries
       // key: username, value: number of edits made by them
-      if (username in userEntries) {
-          userEntries[username] += 1;
-      }
-      else {
-        userEntries[username] = 1;
-      }
 
+      if (username in displayEntries) {
+        displayEntries[username] += 1;
+      } else {
+        displayEntries[username] = 1;
+      }
+    }
+
+    function displayHistory(userSnapshot, prevChildName) {
+      getHistory(userSnapshot, prevChildName);
+      /* for (var userId in displayEntries) {
+        if (displayEntries.hasOwnProperty(userId)) {
+          var div = userEntries[userId];
+          if (div) {
+            userEntryList.removeChild(div);
+            delete userEntries[userId];
+          }
+        } */
+
+      console.log(displayEntries);
       // TO DO: create html to display the information
-      var pieDiv = elt('div', userEntries[username], { 'class': 'piechart', 'style' : '' }); // change HTML style of piechart in code.html to be able to change the size variables rather than having it in the CSS file
-      colorDiv.style.backgroundColor = color;
+      //var pieDiv = elt('div', userEntries[username], { 'class': 'piechart', 'style' : '' }); // change HTML style of piechart in code.html to be able to change the size variables rather than having it in the CSS file
+      // colorDiv.style.backgroundColor = color;
 
-      //test adding user edits 
-      // want to append a child <p>
-      var testDiv = elt('p', username, {'class': 'test-user-edits'}); // How would I add the user color in here as a style?
-      userEntryList.appendChild(testDiv);
+      //test adding user edits
+      // want to append a child <p> with username, color, and number of edits made by them
+      var testDiv = elt("p", userId, { class: "test-user-edits" }); // How would I add the user color in here as a style?
+      //console.log(testDiv);
+      // userEntryList.appendChild(testDiv);
 
       //var nameDiv = elt('div', name || 'Guest', { 'class': 'userlist' });
-      var nameDiv = elt('div', name || 'Guest');
+      // var nameDiv = elt('div', name || 'Guest');
 
-      var userDiv = elt('div', [ colorDiv, nameDiv ], {
-        'class': 'firepad-userlist-user ' + 'firepad-user-' + userId
-      });
-      userId2Element[userId] = userDiv;
+      //var userDiv = elt('div', [ colorDiv, nameDiv ], {
+      //  'class': 'firepad-userlist-user ' + 'firepad-user-' + userId
+      //});
+
+      userEntries[userId] = testDiv;
+      console.log(userEntries);
 
       //adds the new element to the list to be displayed
-      var nextElement =  prevChildName ? userId2Element[prevChildName].nextSibling : userList.firstChild;
-      userList.insertBefore(userDiv, nextElement);
-
-
-
-
-
-
+      var nextElement = prevChildName
+        ? userEntries[prevChildName].nextSibling
+        : userEntryList.firstChild;
+      userEntryList.insertBefore(testDiv, nextElement);
     }
 
     //listeners for when things are changed in the database for the history
-    this.firebaseOn_(this.ref_.child('history'), 'child_added', getHistory);
-    this.firebaseOn_(this.ref_.child('history'), 'child_changed', getHistory);
-    this.firebaseOn_(this.ref_.child('history'), 'child_moved', getHistory);
-
-    return userList;
+    this.firebaseOn_(this.ref_.child("history"), "child_added", displayHistory);
+    this.firebaseOn_(
+      this.ref_.child("history"),
+      "child_changed",
+      displayHistory
+    );
+    this.firebaseOn_(this.ref_.child("history"), "child_moved", displayHistory);
+    console.log(userEntryList);
+    return userEntryList;
   };
 
   /** below here are helper functions you do not need to change */
-  FirepadHistoryList.prototype.firebaseOn_ = function(ref, eventType, callback, context) {
-    this.firebaseCallbacks_.push({ref: ref, eventType: eventType, callback: callback, context: context });
+  FirepadHistoryList.prototype.firebaseOn_ = function(
+    ref,
+    eventType,
+    callback,
+    context
+  ) {
+    this.firebaseCallbacks_.push({
+      ref: ref,
+      eventType: eventType,
+      callback: callback,
+      context: context
+    });
     ref.on(eventType, callback, context);
     return callback;
   };
 
-  FirepadHistoryList.prototype.firebaseOff_ = function(ref, eventType, callback, context) {
+  FirepadHistoryList.prototype.firebaseOff_ = function(
+    ref,
+    eventType,
+    callback,
+    context
+  ) {
     ref.off(eventType, callback, context);
-    for(var i = 0; i < this.firebaseCallbacks_.length; i++) {
+    for (var i = 0; i < this.firebaseCallbacks_.length; i++) {
       var l = this.firebaseCallbacks_[i];
-      if (l.ref === ref && l.eventType === eventType && l.callback === callback && l.context === context) {
+      if (
+        l.ref === ref &&
+        l.eventType === eventType &&
+        l.callback === callback &&
+        l.context === context
+      ) {
         this.firebaseCallbacks_.splice(i, 1);
         break;
       }
@@ -192,7 +231,7 @@ var FirepadHistoryList = (function() {
   };
 
   FirepadHistoryList.prototype.removeFirebaseCallbacks_ = function() {
-    for(var i = 0; i < this.firebaseCallbacks_.length; i++) {
+    for (var i = 0; i < this.firebaseCallbacks_.length; i++) {
       var l = this.firebaseCallbacks_[i];
       l.ref.off(l.eventType, l.callback, l.context);
     }
@@ -202,10 +241,11 @@ var FirepadHistoryList = (function() {
   /** Assorted helpers */
 
   function isValidColor(color) {
-    return typeof color === 'string' &&
-      (color.match(/^#[a-fA-F0-9]{3,6}$/) || color == 'transparent');
+    return (
+      typeof color === "string" &&
+      (color.match(/^#[a-fA-F0-9]{3,6}$/) || color == "transparent")
+    );
   }
-
 
   /** DOM helpers */
   function elt(tag, content, attrs) {
@@ -213,9 +253,11 @@ var FirepadHistoryList = (function() {
     if (typeof content === "string") {
       setTextContent(e, content);
     } else if (content) {
-      for (var i = 0; i < content.length; ++i) { e.appendChild(content[i]); }
+      for (var i = 0; i < content.length; ++i) {
+        e.appendChild(content[i]);
+      }
     }
-    for(var attr in (attrs || { })) {
+    for (var attr in attrs || {}) {
       e.setAttribute(attr, attrs[attr]);
     }
     return e;

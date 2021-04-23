@@ -157,11 +157,7 @@
         );
 
         //// Create Firepadhistory.
-        var firepadHistory = FirepadHistoryList.fromDiv(
-          firepadRef,
-          document.getElementById("side-info"),
-          userId
-        );
+        var firepadHistory = FirepadHistoryList.fromDiv(firepadRef,document.getElementById("test"),userId);
 
         //// Initialize contents.
         firepad.on("ready", function() {
@@ -173,7 +169,7 @@
 
       // NEED to call getHistory from js getHistory to get numbers for piechart
       // how do I call this so it sends in the test div ??
-      var getHistory = getHistory.fromDiv(firepadRef, document.getElementById("test"), userId);
+      // var getHistory = firepadHistoryList.fromDiv(firepadRef, document.getElementById("test"), userId);
 
 
       // Helper to get hash from end of URL or generate a random one.
