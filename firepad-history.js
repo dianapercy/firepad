@@ -12,8 +12,8 @@ var FirepadHistoryList = (function() {
     var self = this;
 
     // what you have built in this file is added to the element passed in
-    this.userList_ = this.makeUserList_();
-    place.appendChild(this.userList_);
+    this.userEntryList_ = this.makeUserList_();
+    place.appendChild(this.userEntryList_);
   }
 
   // This is the primary "constructor" for symmetry with Firepad.
@@ -46,8 +46,8 @@ var FirepadHistoryList = (function() {
      * for different types of data
      */
     var self = this;
-    var userList = elt("div");
-    var userId2Element = {};
+    //var userList = elt("div");
+    //var userId2Element = {};
     var userEntries = {};
     var userEntryList = elt("div");
     var displayEntries = {};
@@ -108,7 +108,7 @@ var FirepadHistoryList = (function() {
     });
     */
 
-    function getHistory(userSnapshot, prevChildName) {
+    function getHistory(userSnapshot) {
       /**
        * This function gets data about the changes made to the firepad
        */
@@ -141,16 +141,21 @@ var FirepadHistoryList = (function() {
       }
     }
 
-    function displayHistory(userSnapshot, prevChildName) {
-      getHistory(userSnapshot, prevChildName);
-      /* for (var userId in displayEntries) {
-        if (displayEntries.hasOwnProperty(userId)) {
-          var div = userEntries[userId];
-          if (div) {
-            userEntryList.removeChild(div);
-            delete userEntries[userId];
-          }
-        } */
+    function displayHistory(userSnapshot) {
+      getHistory(userSnapshot);     
+
+      for (let userId in displayEntries) {
+        var div = userEntries[userId];
+        if (div) {
+          userEntryList.removeChild(div);
+          delete userEntries[userId];
+        }
+      }
+      var div = userEntries["none"];
+      if (div) {
+        userEntryList.removeChild(div);
+        delete userEntries['none'];
+      }
 
       console.log(displayEntries);
       // TO DO: create html to display the information
@@ -159,25 +164,22 @@ var FirepadHistoryList = (function() {
 
       //test adding user edits
       // want to append a child <p> with username, color, and number of edits made by them
-      var testDiv = elt("p", userId, { class: "test-user-edits" }); // How would I add the user color in here as a style?
-      //console.log(testDiv);
-      // userEntryList.appendChild(testDiv);
+      if (Object.keys(displayEntries).length == 1) {
+        var nonePar = elt("p", "There are no edits.", { class: "test-user-edits" });
+        userEntries["none"] = nonePar;
+        userEntryList.appendChild(nonePar);
+      } else {
+        for (let k in displayEntries) {
+          if (k != "") {
+            var userDiv = elt("p", k + " has " + displayEntries[k] + " edits.", { class: "test-user-edits" }); // How would I add the user color in here as a style?
+            userEntries[k] = userDiv;
+            userEntryList.appendChild(userDiv);
+          }
+        }
+      }
 
-      //var nameDiv = elt('div', name || 'Guest', { 'class': 'userlist' });
-      // var nameDiv = elt('div', name || 'Guest');
-
-      //var userDiv = elt('div', [ colorDiv, nameDiv ], {
-      //  'class': 'firepad-userlist-user ' + 'firepad-user-' + userId
-      //});
-
-      userEntries[userId] = testDiv;
       console.log(userEntries);
 
-      //adds the new element to the list to be displayed
-      var nextElement = prevChildName
-        ? userEntries[prevChildName].nextSibling
-        : userEntryList.firstChild;
-      userEntryList.insertBefore(testDiv, nextElement);
     }
 
     //listeners for when things are changed in the database for the history
