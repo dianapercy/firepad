@@ -37,7 +37,7 @@ var FirepadHistoryList = (function() {
     /** header */
     //return elt('div', [
     //  elt('span', 'View Collaboration Metrics')], { 'class': 'userlist' });
-    return elt("div", [elt("span", "View Collaboration Metrics")]);
+    return elt("div", [elt("span", "Collaboration Metrics")]);
   };
 
   FirepadHistoryList.prototype.makeUserEntries_ = function() {
@@ -51,6 +51,7 @@ var FirepadHistoryList = (function() {
     var userEntries = {};
     var userEntryList = elt("div");
     var displayEntries = {};
+    var displayNames = {};
 
     // TO DO: change all of the classes to match the css you want to use
     /*
@@ -130,19 +131,31 @@ var FirepadHistoryList = (function() {
         color = userSnapshot.child("color").val();
       }
 
+      console.log(edit);
       // TO DO: do any calculations you need to with the data
       // Accumulate the number of entries made by a certain user into a dictionary userEntries
       // key: username, value: number of edits made by them
-
-      if (username in displayEntries) {
-        displayEntries[username] += 1;
+      if (edit != -1) {
+        if (username in displayEntries) {
+          displayEntries[username] += 1;
+        } else {
+          displayEntries[username] = 1;
+        }
       } else {
-        displayEntries[username] = 1;
+        if (username in displayEntries) {
+          if (displayEntries[username] == 0) {
+            displayEntries[username] = 0;
+          } else {
+            displayEntries[username] -= 1;
+          }
+        } else {
+          displayEntries[username] = 0;
+        }
       }
     }
 
     function displayHistory(userSnapshot) {
-      getHistory(userSnapshot);     
+      getHistory(userSnapshot);
 
       for (let userId in displayEntries) {
         var div = userEntries[userId];
@@ -154,7 +167,7 @@ var FirepadHistoryList = (function() {
       var div = userEntries["none"];
       if (div) {
         userEntryList.removeChild(div);
-        delete userEntries['none'];
+        delete userEntries["none"];
       }
 
       console.log(displayEntries);
@@ -165,25 +178,39 @@ var FirepadHistoryList = (function() {
       //test adding user edits
       // want to append a child <p> with username, color, and number of edits made by them
       if (Object.keys(displayEntries).length == 1) {
-        var nonePar = elt("p", "There are no edits.", { class: "test-user-edits" });
+        var nonePar = elt("p", "There are no edits.", {
+          class: "test-user-edits"
+        });
         userEntries["none"] = nonePar;
         userEntryList.appendChild(nonePar);
       } else {
         for (let k in displayEntries) {
           if (k != "") {
-            var userDiv = elt("p", k + " has " + displayEntries[k] + " edits.", { class: "test-user-edits" }); // How would I add the user color in here as a style?
+            var userDiv = elt(
+              "p",
+              k + " has " + displayEntries[k] + " edits.",
+              { class: "test-user-edits" }
+            ); // How would I add the user color in here as a style?
             userEntries[k] = userDiv;
             userEntryList.appendChild(userDiv);
+            // var pieDiv = elt("div", {class : "pie-chart"});
           }
         }
       }
 
       console.log(userEntries);
-
     }
+
+    function getDisplayName(userSnapshot) {
+      // get display name from users and add to dictionary with usernames and userIds
+    }
+
+
 
     //listeners for when things are changed in the database for the history
     this.firebaseOn_(this.ref_.child("history"), "child_added", displayHistory);
+    this.firebaseOn_(this.ref_.child("users"), "child_added", getDisplayName);
+    this.firebaseOn_(this.ref_.child("users"), "child_changed", getDisplayName);
     this.firebaseOn_(
       this.ref_.child("history"),
       "child_changed",
