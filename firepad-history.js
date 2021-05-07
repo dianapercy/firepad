@@ -210,13 +210,15 @@ var FirepadHistoryList = (function() {
       */
       var userId = userSnapshot.key;
       displayName = "";
+      displayColor = "";
 
       displayName = userSnapshot.child("name").val();
+      displayColor = userSnapshot.child("color").val();
       if (displayName != null) {
         userIdToDisplayName[userId] = displayName;
       }
       console.log(userId);
-      console.log(displayName);
+      console.log(userIdToDisplayName[userId]);
     }
 
     //listeners for when things are changed in the database for the history

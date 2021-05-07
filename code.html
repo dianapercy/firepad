@@ -33,6 +33,37 @@
     <!-- style sheet for sidebar with collaboration -->
     <link rel="stylesheet" href="firepad-collaboration.css" />
 
+    <!-- configuration for pie chart -->
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <script type="text/javascript">
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ["User", "Number of Edits"],
+          ["User 1", 11],
+          ["User 2", 2],
+          ["User 3", 30],
+        ]);
+
+        var options = {
+          backgroundColor: {color: "#111", fill: "#111", stroke: "#111"},
+          chartArea: {backgroundColor: "#111", width: "75%", height: "75%"},
+          legend: {position: "labeled", textStyle: {color: "white", fontSize: 16, fontName: "Verdana"}},
+          colors: ["#a8dadc", "#457b9d", "#1d3557"]
+        };
+
+        var chart = new google.visualization.PieChart(
+          document.getElementById("piechart")
+        );
+
+        chart.draw(data, options);
+      }
+    </script>
 
     <style>
       html {
@@ -61,44 +92,18 @@
         left: 175px;
         top: 0;
         bottom: 0;
-        right: 175px;
+        right: 300px;
         height: auto;
         border-style: solid;
       }
-
-      .piechart {
-        margin-top: 300px;
-        display: block;
-        position: absolute;
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        background-image: conic-gradient(
-          pink 70deg,
-          lightblue 0 235deg,
-          orange 0
-        );
-      }
-
-      body,
-      .piechart {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
     </style>
   </head>
-
   <body onload="init()">
     <div id="userlist"></div>
     <div id="firepad-container"></div>
     <div class="sidenav" id="side-info">
-      <div class = "test-user-edits" id = "test"></div>
-      <!--<div class="piechart" style="background-image: conic-gradient(
-        pink 70deg,
-        lightblue 0 235deg,
-        orange 0 
-        );"></div> -->
+      <div class="test-user-edits" id="test"></div>
+      <div id="piechart" class="piechart"></div>
     </div>
 
     <script>
@@ -154,7 +159,11 @@
         );
 
         //// Create Firepadhistory.
-        var firepadHistory = FirepadHistoryList.fromDiv(firepadRef,document.getElementById("test"),userId);
+        var firepadHistory = FirepadHistoryList.fromDiv(
+          firepadRef,
+          document.getElementById("test"),
+          userId
+        );
 
         //// Initialize contents.
         firepad.on("ready", function() {
@@ -168,10 +177,8 @@
       // how do I call this so it sends in the test div ??
       // var getHistory = firepadHistoryList.fromDiv(firepadRef, document.getElementById("test"), userId);
 
-
       // Helper to get hash from end of URL or generate a random one.
       function getExampleRef() {
-        
         var ref = firebase.database().ref();
         var hash = window.location.hash.replace(/#/g, "");
         if (hash) {
