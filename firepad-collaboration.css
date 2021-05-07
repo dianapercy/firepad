@@ -1,7 +1,7 @@
 /* The sidebar menu */
 .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 175px; /* Set the width of the sidebar */
+    width: 300px; /* Set the width of the sidebar */
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
@@ -26,23 +26,6 @@
     color: #f1f1f1;
   }
 
-.pie-chart {
-    margin-top: 50px;
-    display: block;
-    position: absolute;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-     /* how do I get these values to be variable? 
-    */
-}
-
-body, .pie-chart {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .test-user-edits {
   padding: 6px 8px 6px 16px;
   text-decoration: none;
@@ -50,4 +33,11 @@ body, .pie-chart {
   font-family: Verdana, sans-serif;
   color: white;
   display: block;
+}
+
+.piechart {
+  width: 300px;
+  height: 300px;
+  backgroundColor: #111;
+  
 }
