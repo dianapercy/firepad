@@ -51,7 +51,7 @@ var FirepadHistoryList = (function() {
     var userEntries = {};
     var userEntryList = elt("div");
     var displayEntries = {};
-    var displayNames = {};
+    var userIdToDisplayName = {};
 
     // TO DO: change all of the classes to match the css you want to use
     /*
@@ -170,7 +170,7 @@ var FirepadHistoryList = (function() {
         delete userEntries["none"];
       }
 
-      console.log(displayEntries);
+      // console.log(displayEntries);
       // TO DO: create html to display the information
       //var pieDiv = elt('div', userEntries[username], { 'class': 'piechart', 'style' : '' }); // change HTML style of piechart in code.html to be able to change the size variables rather than having it in the CSS file
       // colorDiv.style.backgroundColor = color;
@@ -183,29 +183,41 @@ var FirepadHistoryList = (function() {
         });
         userEntries["none"] = nonePar;
         userEntryList.appendChild(nonePar);
-      } else {
+      } 
+      else {
         for (let k in displayEntries) {
+          displayName = userIdToDisplayName[k];
           if (k != "") {
             var userDiv = elt(
               "p",
-              k + " has " + displayEntries[k] + " edits.",
+              displayName + " has " + displayEntries[k] + " edits.",
               { class: "test-user-edits" }
-            ); // How would I add the user color in here as a style?
+            );
             userEntries[k] = userDiv;
             userEntryList.appendChild(userDiv);
             // var pieDiv = elt("div", {class : "pie-chart"});
           }
+          console.log(displayEntries);
         }
       }
-
-      console.log(userEntries);
     }
 
     function getDisplayName(userSnapshot) {
-      // get display name from users and add to dictionary with usernames and userIds
+      /* 
+      Gets displayName from database and puts into 
+      dictionary userIdToDisplayName with key: userId and value: displayName
+      Is called by listener anytime a child is changed or added 
+      */
+      var userId = userSnapshot.key;
+      displayName = "";
+
+      displayName = userSnapshot.child("name").val();
+      if (displayName != null) {
+        userIdToDisplayName[userId] = displayName;
+      }
+      console.log(userId);
+      console.log(displayName);
     }
-
-
 
     //listeners for when things are changed in the database for the history
     this.firebaseOn_(this.ref_.child("history"), "child_added", displayHistory);
