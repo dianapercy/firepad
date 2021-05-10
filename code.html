@@ -33,8 +33,11 @@
     <!-- style sheet for sidebar with collaboration -->
     <link rel="stylesheet" href="firepad-collaboration.css" />
 
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
     <!-- configuration for pie chart -->
-    <script
+    <!-- <script
       type="text/javascript"
       src="https://www.gstatic.com/charts/loader.js"
     ></script>
@@ -49,13 +52,15 @@
           ["User 2", 2],
           ["User 3", 30],
         ]);
+        // Want to pull usernames and entries from .js
 
         var options = {
           backgroundColor: {color: "#111", fill: "#111", stroke: "#111"},
           chartArea: {backgroundColor: "#111", width: "75%", height: "75%"},
-          legend: {position: "labeled", textStyle: {color: "white", fontSize: 16, fontName: "Verdana"}},
+          legend: {position: "left", textStyle: {color: "white", fontSize: 8, fontName: "Verdana"}},
           colors: ["#a8dadc", "#457b9d", "#1d3557"]
         };
+        // Want to pull colors from database
 
         var chart = new google.visualization.PieChart(
           document.getElementById("piechart")
@@ -63,7 +68,7 @@
 
         chart.draw(data, options);
       }
-    </script>
+    </script> -->
 
     <style>
       html {
@@ -103,7 +108,7 @@
     <div id="firepad-container"></div>
     <div class="sidenav" id="side-info">
       <div class="test-user-edits" id="test"></div>
-      <div id="piechart" class="piechart"></div>
+      <div id="piechart" style="width: 300px; height: 300px"></div>
     </div>
 
     <script>

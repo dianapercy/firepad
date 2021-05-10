@@ -51,6 +51,7 @@ var FirepadHistoryList = (function() {
     var userEntries = {};
     var userEntryList = elt("div");
     var displayEntries = {};
+    var displayDeletions = {};
     var userIdToDisplayName = {};
 
     // TO DO: change all of the classes to match the css you want to use
@@ -135,27 +136,27 @@ var FirepadHistoryList = (function() {
       // TO DO: do any calculations you need to with the data
       // Accumulate the number of entries made by a certain user into a dictionary userEntries
       // key: username, value: number of edits made by them
-      if (edit != -1) {
+
+      if (edit != -1) { // If addition
         if (username in displayEntries) {
           displayEntries[username] += 1;
         } else {
           displayEntries[username] = 1;
         }
-      } else {
-        if (username in displayEntries) {
-          if (displayEntries[username] == 0) {
-            displayEntries[username] = 0;
-          } else {
-            displayEntries[username] -= 1;
-          }
-        } else {
-          displayEntries[username] = 0;
+      } 
+      else { // If deletion
+        if (username in displayDeletions) {
+          displayDeletions[username] += 1;
+        }
+        else {
+          displayDeletions[username] = 1;
         }
       }
     }
 
     function displayHistory(userSnapshot) {
       getHistory(userSnapshot);
+      var pieChartData = [["User", "Edits"]];
 
       for (let userId in displayEntries) {
         var div = userEntries[userId];
@@ -190,16 +191,30 @@ var FirepadHistoryList = (function() {
           if (k != "") {
             var userDiv = elt(
               "p",
-              displayName + " has " + displayEntries[k] + " edits.",
+              displayName + " has " + displayEntries[k] + " additions and " + displayDeletions[k] + " deletions.",
               { class: "test-user-edits" }
             );
             userEntries[k] = userDiv;
             userEntryList.appendChild(userDiv);
-            // var pieDiv = elt("div", {class : "pie-chart"});
+            pieChartData.push([displayName, displayEntries[k]]);
           }
           console.log(displayEntries);
         }
       }
+      var data = google.visualization.arrayToDataTable(pieChartData);
+      // Want to pull usernames and entries from .js
+
+      var options = {
+        backgroundColor: {color: "#111", fill: "#111", stroke: "#111"},
+        chartArea: {backgroundColor: "#111", width: "75%", height: "75%"},
+        legend: {position: "left", textStyle: {color: "white", fontSize: 8, fontName: "Verdana"}},
+        colors: ["#a8dadc", "#457b9d", "#1d3557"]
+      };
+      // Want to pull colors from database
+
+      var chart = new google.visualization.PieChart(this.place_);
+
+      chart.draw(data, options);
     }
 
     function getDisplayName(userSnapshot) {
@@ -221,6 +236,36 @@ var FirepadHistoryList = (function() {
       console.log(userIdToDisplayName[userId]);
     }
 
+ 
+      
+      
+
+      /* function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ["User", "Number of Edits"],
+          ["User 1", 11],
+          ["User 2", 2],
+          ["User 3", 30],
+        ]);
+        // Want to pull usernames and entries from .js
+
+        var options = {
+          backgroundColor: {color: "#111", fill: "#111", stroke: "#111"},
+          chartArea: {backgroundColor: "#111", width: "75%", height: "75%"},
+          legend: {position: "left", textStyle: {color: "white", fontSize: 8, fontName: "Verdana"}},
+          colors: ["#a8dadc", "#457b9d", "#1d3557"]
+        };
+        // Want to pull colors from database
+
+        var chart = new google.visualization.PieChart(
+          document.getElementById("piechart")
+        );
+
+        chart.draw(data, options);
+      } */
+
+    google.charts.load("current", { packages: ["corechart"] });
+    //google.charts.setOnLoadCallback(drawChart);
     //listeners for when things are changed in the database for the history
     this.firebaseOn_(this.ref_.child("history"), "child_added", displayHistory);
     this.firebaseOn_(this.ref_.child("users"), "child_added", getDisplayName);
