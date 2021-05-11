@@ -1,7 +1,7 @@
 var FirepadHistoryList = (function() {
-  function FirepadHistoryList(ref, place, userId, displayName) {
+  function FirepadHistoryList(ref, place, pieChartPlace, userId, displayName) {
     if (!(this instanceof FirepadHistoryList)) {
-      return new FirepadHistoryList(ref, place, userId, displayName);
+      return new FirepadHistoryList(ref, place, pieChartPlace, userId, displayName);
     }
 
     this.ref_ = ref;
@@ -12,14 +12,14 @@ var FirepadHistoryList = (function() {
     var self = this;
 
     // what you have built in this file is added to the element passed in
-    this.userEntryList_ = this.makeUserList_();
+    this.userEntryList_ = this.makeUserList_(pieChartPlace);
     place.appendChild(this.userEntryList_);
   }
 
   // This is the primary "constructor" for symmetry with Firepad.
   FirepadHistoryList.fromDiv = FirepadHistoryList;
 
-  FirepadHistoryList.prototype.makeUserList_ = function() {
+  FirepadHistoryList.prototype.makeUserList_ = function(pieChartPlace) {
     /** the primary function for creating the layout,
      * other functions called from here
      */
@@ -29,7 +29,7 @@ var FirepadHistoryList = (function() {
     //  elt('div', [this.makeUserEntries_()], {'class': 'userlist' })], {'class': 'userlist' });
     return elt("div", [
       this.makeHeading_(),
-      elt("div", [this.makeUserEntries_()], { class: "userlist" })
+      elt("div", [this.makeUserEntries_(pieChartPlace)], { class: "userlist" })
     ]);
   };
 
@@ -40,7 +40,7 @@ var FirepadHistoryList = (function() {
     return elt("div", [elt("span", "Collaboration Metrics")]);
   };
 
-  FirepadHistoryList.prototype.makeUserEntries_ = function() {
+  FirepadHistoryList.prototype.makeUserEntries_ = function(pieChartPlace) {
     /** Begin to build the html from the database
      * Within here we have different help functions
      * for different types of data
@@ -53,72 +53,15 @@ var FirepadHistoryList = (function() {
     var displayEntries = {};
     var displayDeletions = {};
     var userIdToDisplayName = {};
-
-    // TO DO: change all of the classes to match the css you want to use
-    /*
-    function getUsers(userSnapshot, prevChildName) {
-    
-    // This function gets a list of the users currently signed in
-    // and creates the html to display them
-    
-      var userId = userSnapshot.key;
-      var div = userId2Element[userId];
-      if (div) {
-        userList.removeChild(div);
-        delete userId2Element[userId];
-      }
-
-      //get the name of the user, default to guest
-      var name = userSnapshot.child('name').val();
-      if (typeof name !== 'string') { name = 'Guest'; }
-      name = name.substring(0, 20);
-
-      //get the color of the user, default to yellow
-      var color = userSnapshot.child('color').val();
-      if (!isValidColor(color)) {
-        color = "#ffb"
-      }
-
-      //begins to build out the html to display
-      var colorDiv = elt('div', null, { 'class': 'firepad-userlist-color-indicator' });
-      colorDiv.style.backgroundColor = color;
-
-      //var nameDiv = elt('div', name || 'Guest', { 'class': 'userlist' });
-      var nameDiv = elt('div', name || 'Guest');
-
-      var userDiv = elt('div', [ colorDiv, nameDiv ], {
-        'class': 'firepad-userlist-user ' + 'firepad-user-' + userId
-      });
-      userId2Element[userId] = userDiv;
-
-      //adds the new element to the list to be displayed
-      var nextElement =  prevChildName ? userId2Element[prevChildName].nextSibling : userList.firstChild;
-      userList.insertBefore(userDiv, nextElement);
-    }
-
-    //listeners for when things are changed in the database for the users
-    this.firebaseOn_(this.ref_.child('users'), 'child_added', getUsers);
-    this.firebaseOn_(this.ref_.child('users'), 'child_changed', getUsers);
-    this.firebaseOn_(this.ref_.child('users'), 'child_moved', getUsers);
-    this.firebaseOn_(this.ref_.child('users'), 'child_removed', function(removedSnapshot) {
-      var userId = removedSnapshot.key;
-      var div = userId2Element[userId];
-      if (div) {
-        userList.removeChild(div);
-        delete userId2Element[userId];
-      }
-    });
-    */
+    var userColors = [];
 
     function getHistory(userSnapshot) {
-      /**
+      /*
        * This function gets data about the changes made to the firepad
        */
-      //edit id
       var editId = userSnapshot.key;
 
-      //get the username for who made the edit and edit info only if
-      //it is not the first default edit
+      // Get the information about the edit if it is not the first default edit
       var username = "";
       var editLocation = "";
       var time = "";
@@ -128,15 +71,11 @@ var FirepadHistoryList = (function() {
         username = userSnapshot.child("a").val();
         editLocation = userSnapshot.child("o/0").val();
         time = userSnapshot.child("t").val();
-        edit = userSnapshot.child("o/1").val();
-        color = userSnapshot.child("color").val();
+        edit = userSnapshot.child("o/1").val();        
       }
 
-      console.log(edit);
-      // TO DO: do any calculations you need to with the data
-      // Accumulate the number of entries made by a certain user into a dictionary userEntries
-      // key: username, value: number of edits made by them
-
+      // Accumulate the number of additions/deletions made by a certain user into dictionary displayEntries and displayDeletions
+      // key: userId, value: number of additions/deletions made by them
       if (edit != -1) { // If addition
         if (username in displayEntries) {
           displayEntries[username] += 1;
@@ -173,9 +112,7 @@ var FirepadHistoryList = (function() {
 
       // console.log(displayEntries);
       // TO DO: create html to display the information
-      //var pieDiv = elt('div', userEntries[username], { 'class': 'piechart', 'style' : '' }); // change HTML style of piechart in code.html to be able to change the size variables rather than having it in the CSS file
-      // colorDiv.style.backgroundColor = color;
-
+     
       //test adding user edits
       // want to append a child <p> with username, color, and number of edits made by them
       if (Object.keys(displayEntries).length == 1) {
@@ -198,26 +135,25 @@ var FirepadHistoryList = (function() {
             userEntryList.appendChild(userDiv);
             pieChartData.push([displayName, displayEntries[k]]);
           }
-          console.log(displayEntries);
         }
       }
       var data = google.visualization.arrayToDataTable(pieChartData);
-      // Want to pull usernames and entries from .js
 
       var options = {
         backgroundColor: {color: "#111", fill: "#111", stroke: "#111"},
         chartArea: {backgroundColor: "#111", width: "75%", height: "75%"},
         legend: {position: "left", textStyle: {color: "white", fontSize: 8, fontName: "Verdana"}},
-        colors: ["#a8dadc", "#457b9d", "#1d3557"]
+        colors: userColors
       };
       // Want to pull colors from database
 
-      var chart = new google.visualization.PieChart(this.place_);
+      var chart = new google.visualization.PieChart(pieChartPlace);
+      // See if we can append chart as a child to userEntryList
 
       chart.draw(data, options);
     }
 
-    function getDisplayName(userSnapshot) {
+    function getDisplayInfo(userSnapshot) {
       /* 
       Gets displayName from database and puts into 
       dictionary userIdToDisplayName with key: userId and value: displayName
@@ -232,44 +168,18 @@ var FirepadHistoryList = (function() {
       if (displayName != null) {
         userIdToDisplayName[userId] = displayName;
       }
-      console.log(userId);
-      console.log(userIdToDisplayName[userId]);
+      var hasColor = userColors.includes(displayColor);
+      if (hasColor == false) {
+        userColors.unshift(displayColor);
+      }
+      console.log(userColors);
     }
 
- 
-      
-      
-
-      /* function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ["User", "Number of Edits"],
-          ["User 1", 11],
-          ["User 2", 2],
-          ["User 3", 30],
-        ]);
-        // Want to pull usernames and entries from .js
-
-        var options = {
-          backgroundColor: {color: "#111", fill: "#111", stroke: "#111"},
-          chartArea: {backgroundColor: "#111", width: "75%", height: "75%"},
-          legend: {position: "left", textStyle: {color: "white", fontSize: 8, fontName: "Verdana"}},
-          colors: ["#a8dadc", "#457b9d", "#1d3557"]
-        };
-        // Want to pull colors from database
-
-        var chart = new google.visualization.PieChart(
-          document.getElementById("piechart")
-        );
-
-        chart.draw(data, options);
-      } */
-
     google.charts.load("current", { packages: ["corechart"] });
-    //google.charts.setOnLoadCallback(drawChart);
     //listeners for when things are changed in the database for the history
     this.firebaseOn_(this.ref_.child("history"), "child_added", displayHistory);
-    this.firebaseOn_(this.ref_.child("users"), "child_added", getDisplayName);
-    this.firebaseOn_(this.ref_.child("users"), "child_changed", getDisplayName);
+    this.firebaseOn_(this.ref_.child("users"), "child_added", getDisplayInfo);
+    this.firebaseOn_(this.ref_.child("users"), "child_changed", getDisplayInfo);
     this.firebaseOn_(
       this.ref_.child("history"),
       "child_changed",
