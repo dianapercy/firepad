@@ -23,10 +23,6 @@ var FirepadHistoryList = (function() {
     /** the primary function for creating the layout,
      * other functions called from here
      */
-
-    //return elt('div', [
-    //  this.makeHeading_(),
-    //  elt('div', [this.makeUserEntries_()], {'class': 'userlist' })], {'class': 'userlist' });
     return elt("div", [
       this.makeHeading_(),
       elt("div", [this.makeUserEntries_(pieChartPlace)], { class: "userlist" })
@@ -35,8 +31,6 @@ var FirepadHistoryList = (function() {
 
   FirepadHistoryList.prototype.makeHeading_ = function() {
     /** header */
-    //return elt('div', [
-    //  elt('span', 'View Collaboration Metrics')], { 'class': 'userlist' });
     return elt("div", [elt("span", "Collaboration Metrics")]);
   };
 
@@ -46,14 +40,13 @@ var FirepadHistoryList = (function() {
      * for different types of data
      */
     var self = this;
-    //var userList = elt("div");
-    //var userId2Element = {};
     var userEntries = {};
     var userEntryList = elt("div");
     var displayEntries = {};
     var displayDeletions = {};
     var userIdToDisplayName = {};
     var userColors = [];
+    var userIdToColor = {};
 
     function getHistory(userSnapshot) {
       /*
@@ -96,6 +89,7 @@ var FirepadHistoryList = (function() {
     function displayHistory(userSnapshot) {
       getHistory(userSnapshot);
       var pieChartData = [["User", "Edits"]];
+      userColors = [];
 
       for (let userId in displayEntries) {
         var div = userEntries[userId];
@@ -123,21 +117,33 @@ var FirepadHistoryList = (function() {
         userEntryList.appendChild(nonePar);
       } 
       else {
-        for (let k in displayEntries) {
+        // Sort displayEntries
+        var keys = Object.keys(displayEntries);
+        keys.sort();
+        console.log(keys);
+        for (let k in keys) {
+          console.log(k);
+          k = keys[k];
           displayName = userIdToDisplayName[k];
           if (k != "") {
             var userDiv = elt(
               "p",
-              displayName + " has " + displayEntries[k] + " additions and " + displayDeletions[k] + " deletions.",
+              displayName + " has " + displayEntries[k] + " additions and " + get(displayDeletions, k, 0) + " deletions.",
               { class: "test-user-edits" }
             );
             userEntries[k] = userDiv;
             userEntryList.appendChild(userDiv);
             pieChartData.push([displayName, displayEntries[k]]);
+            var hasColor = userColors.includes(userIdToColor[k]);
+            if (hasColor == false) {
+              userColors.push(userIdToColor[k]);
+            }
           }
         }
       }
       var data = google.visualization.arrayToDataTable(pieChartData);
+      console.log(pieChartData);
+      console.log(userColors);
 
       var options = {
         backgroundColor: {color: "#111", fill: "#111", stroke: "#111"},
@@ -168,11 +174,7 @@ var FirepadHistoryList = (function() {
       if (displayName != null) {
         userIdToDisplayName[userId] = displayName;
       }
-      var hasColor = userColors.includes(displayColor);
-      if (hasColor == false) {
-        userColors.unshift(displayColor);
-      }
-      console.log(userColors);
+      userIdToColor[userId] = displayColor;
     }
 
     google.charts.load("current", { packages: ["corechart"] });
@@ -186,11 +188,15 @@ var FirepadHistoryList = (function() {
       displayHistory
     );
     this.firebaseOn_(this.ref_.child("history"), "child_moved", displayHistory);
-    console.log(userEntryList);
     return userEntryList;
   };
 
   /** below here are helper functions you do not need to change */
+  function get(object, key, default_value) {
+    var result = object[key];
+    return (typeof result !== "undefined") ? result : default_value;
+  }
+
   FirepadHistoryList.prototype.firebaseOn_ = function(
     ref,
     eventType,
